@@ -1,0 +1,61 @@
+# Copyright 2022 Fall Lewis YOMBA
+#
+
+steps:
+    
+- name: gcr.io/cloud-builders/gcloud
+  entrypoint: /bin/bash
+  args:
+  - -c
+  - |
+    gcloud container images delete --force-delete-tags gcr.io/$PROJECT_ID/cargo1:latest
+    
+- name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -c
+  - |
+    docker rmi -f gcr.io/$PROJECT_ID/cargo1:latest
+    docker build --no-cache -t gcr.io/$PROJECT_ID/cargo1:latest  . &&
+    docker build --no-cache -t gcr.io/$PROJECT_ID/cargo1:$SHORT_SHA  . &&   
+    docker image inspect gcr.io/$PROJECT_ID/cargo1:$SHORT_SHA --format \
+    '{{index .RepoTags 0}}@{{.Id}}' > /workspace/image-digest.txt && \
+    cat image-digest.txt
+    
+- name: gcr.io/cloud-builders/docker
+  entrypoint: /bin/bash
+  args:
+  - -c
+  - |
+     docker push gcr.io/$PROJECT_ID/cargo1:$SHORT_SHA
+     docker push gcr.io/$PROJECT_ID/cargo1:latest
+     
+- name: gcr.io/cloud-builders/gcloud
+  entrypoint: /bin/bash
+  args:
+  - -c
+  - |
+    gcloud artifacts docker images scan gcr.io/$PROJECT_ID/cargo1:$SHORT_SHA --format='value(response.scan)' > /workspace/scan_id.txt
+
+- name: gcr.io/cloud-builders/gcloud
+  entrypoint: /bin/bash
+  args:
+  - -c
+  - |
+    gcloud artifacts docker images list-vulnerabilities $(cat /workspace/scan_id.txt) \
+    --format='value(vulnerability.effectiveSeverity)' | if grep -Fxq $_SEVERITY; \
+    then echo 'Failed vulnerability check' && exit 1; else exit 0; fi
+       
+- name: "gcr.io/cloud-builders/gke-deploy"
+  args:
+  - run
+  - --filename=kubernetes
+  - --location=us-central1-b
+  - --cluster=eazytraining-cluster
+  - --image=gcr.io/$PROJECT_ID/cargo1:$SHORT_SHA
+
+images:
+- 'gcr.io/$PROJECT_ID/cargo1:$SHORT_SHA'
+
+tags: ['gcp-cloud-build-eazytraining']
+

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cargo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cargo
+  template:
+    metadata:
+      labels:
+        app: cargo
+    spec:
+      containers:
+      - name: cargo
+        image: gcr.io/eazytraining-341213/cargo:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cargo
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: cargo
+
+
+
