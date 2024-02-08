@@ -50,8 +50,8 @@ steps:
   args:
   - run
   - --filename=kubernetes
-  - --location=us-central1-b
-  - --cluster=eazytraining-cluster
+  - --location=us-central1
+  - --cluster=autocluster
   - --image=gcr.io/$PROJECT_ID/cargo1:$SHORT_SHA
 
 images:
