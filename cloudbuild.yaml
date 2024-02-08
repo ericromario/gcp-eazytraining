@@ -3,12 +3,12 @@
 
 steps:
     
-- name: gcr.io/cloud-builders/gcloud
-  entrypoint: /bin/bash
-  args:
-  - -c
-  - |
-    gcloud container images delete --force-delete-tags gcr.io/$PROJECT_ID/cargo1:latest
+# - name: gcr.io/cloud-builders/gcloud
+#   entrypoint: /bin/bash
+#   args:
+#   - -c
+#   - |
+#     gcloud container images delete --force-delete-tags gcr.io/$PROJECT_ID/cargo1:latest
     
 - name: gcr.io/cloud-builders/docker
   entrypoint: /bin/bash
