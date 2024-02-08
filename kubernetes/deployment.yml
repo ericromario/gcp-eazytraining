@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: cargo2
-        image: gcr.io/eazytraining-341213/cargo:latest
+        image: gcr.io/easytraining-413521/cargo1:latest
         ports:
         - containerPort: 80
 ---
