@@ -51,7 +51,7 @@ steps:
   - run
   - --filename=kubernetes
   - --location=us-central1 
-  - --cluster=autocluster
+  - --cluster=easytraining-413521-gke
   - --image=gcr.io/$PROJECT_ID/cargo1:$SHORT_SHA
 
 images:
